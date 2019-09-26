@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "The region where resources are deployed"
+        },
+        "defaultValue": "[resourceGroup().location]"
+      },
+      "eventGridTopicName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of Event Grid Topic"
+        },
+        "defaultValue": "[concat('eventgridtopic-', uniqueString(resourceGroup().id))]"
+      },
+      "eventGridSubscriptionName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of Event Grid Subscription"
+        },
+        "defaultValue": "[concat('eventgridsubscription-', uniqueString(resourceGroup().id))]"
+      },
+      "eventGridSubscriptionIncludedEventTypes": {
+        "type": "string",
+        "metadata": {
+          "description": "Comma delimited list of filters for Event Grid Subscription. Default value is 'All' and other event types depend on how Event Grid Topic defines"
+        },
+        "defaultValue": "All"
+      }
+    },
+    "variables": {
+      "eventGridTopic": {
+        "name": "[parameters('eventGridTopicName')]",
+        "resourceId": "[resourceId('Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]",
+        "location": "[parameters('location')]"
+      },
+      "eventGridSubscription": {
+        "name": "[parameters('eventGridSubscriptionName')]",
+        "location": "[parameters('location')]",
+        "filter": {
+          "includedEventTypes": "[split(parameters('eventGridSubscriptionIncludedEventTypes'), ',')]"
+        }
+      }
+    },
+    "resources": [
+      {
+        "apiVersion": "2018-05-01-preview",
+        "type": "Microsoft.EventGrid/topics",
+        "name": "[variables('eventGridTopic').name]",
+        "location": "[variables('eventGridTopic').location]",
+        "properties": {
+          "inputSchema": "CloudEventV01Schema"
+        }
+      },
+      {
+        "apiVersion": "2018-05-01-preview",
+        "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
+        "name": "[concat(variables('eventGridTopic').name, '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
+        "location": "[variables('eventGridSubscription').location]",
+        "tags": "[variables('tags')]",
+        "dependsOn": [
+          "[variables('logicApp').name]",
+          "[variables('eventGridTopic').name]"
+        ],
+        "properties": {
+          "eventDeliverySchema": "CloudEventV01Schema",
+          "destination": {
+            "endpointType": "Webhook",
+            "properties": {
+              "endpointUrl": "[listCallbackUrl(variables('logicApp').triggerId, '2017-07-01').value]"
+            }
+          },
+          "filter": {
+            "includedEventTypes": "[variables('eventGridSubscription').filter.includedEventTypes]",
+            "isSubjectCaseSensitive": false
+          }
+        }
+      }
+    ]
+  }
