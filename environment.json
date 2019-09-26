@@ -9,6 +9,27 @@
         },
         "defaultValue": "[resourceGroup().location]"
       },
+
+      "acrName": {
+        "defaultValue": "thebusacr",
+        "type": "string",
+        "metadata": {
+            "description": "Name of the Azure Container Registry"
+        }
+    },
+
+    "acrTier": {
+        "defaultValue": "Basic",
+        "allowedValues": [
+            "Basic",
+            "Standard",
+            "Premium"
+        ],
+        "type": "string",
+        "metadata": {
+            "description": "Azure Container Registry Tier"
+        }
+    },
       "eventGridTopicName": {
         "type": "string",
         "metadata": {
@@ -46,6 +67,69 @@
       }
     },
     "resources": [
+
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "sku": {
+                "name": "[parameters('acrTier')]",
+                "tier": "[parameters('acrTier')]"
+            },
+            "name": "[parameters('acrName')]",
+            "apiVersion": "2017-10-01",
+            "location": "[variables('location')]",
+            "tags": {
+                "release": "[parameters('buildNumber')]",
+                "customer": "hyperspectral-intelligence"
+            },
+            "properties": {
+                "adminUserEnabled": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "name": "[variables('containerGroupName')]",
+            "apiVersion": "2018-02-01-preview",
+            "location": "[variables('location')]",
+            "tags": {
+                "lifespan": "temporary",
+                "release": "[parameters('buildNumber')]",
+                "customer": "hyperspectral-intelligence"
+            },
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('containerName')]",
+                        "properties": {
+                            "image": "[variables('image')]",
+                            "environmentVariables": [
+                                {
+                                    "name": "queue",
+                                    "value": "[parameters('queueName')]"
+                                },
+                                {
+                                    "name": "connection",
+                                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": "[variables('cpuCores')]",
+                                    "memoryInGb": "[variables('memoryInGb')]"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "osType": "Linux"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+            ]
+        },
       {
         "apiVersion": "2018-05-01-preview",
         "type": "Microsoft.EventGrid/topics",
