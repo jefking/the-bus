@@ -131,12 +131,12 @@
                             "image": "[variables('image')]",
                             "environmentVariables": [
                                 {
-                                    "name": "queue",
-                                    "value": "[parameters('queueName')]"
+                                    "name": "topic",
+                                    "value": "EVENT GRID TOPIC"
                                 },
                                 {
                                     "name": "connection",
-                                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1)]"
+                                    "value": "EVENT GRID CONNECTION"
                                 }
                             ],
                             "resources": {
