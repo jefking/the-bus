@@ -15,7 +15,7 @@ steps:
     location: 'West US 2'
     templateLocation: 'Linked artifact'
     csmFile: './environment.json'
-    deploymentMode: 'Validate'
+    deploymentMode: 'Validation only'
 - task: Docker@2
   displayName: Build an image
   inputs:
