@@ -10,9 +10,15 @@ steps:
     deploymentScope: 'Resource Group'
     ConnectedServiceName: 'Visual Studio Enterprise (011fd5e2-60c9-4a71-8bcd-659a9fbbfd4c)'
     subscriptionName: '011fd5e2-60c9-4a71-8bcd-659a9fbbfd4c'
-    action: 'Validate Resource Group'
+    action: 'Create Or Update Resource Group'
     resourceGroupName: 'thebus'
     location: 'West US 2'
     templateLocation: 'Linked artifact'
     csmFile: './environment.json'
-    deploymentMode: 'Validation only'
+    deploymentMode: 'Complete'
+- task: Docker@2
+  displayName: Build an image
+  inputs:
+    repository: 'jefking/thebus'
+    command: build
+    Dockerfile: compute/Dockerfile
