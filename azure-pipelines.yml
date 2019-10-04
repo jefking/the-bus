@@ -14,7 +14,7 @@ steps:
     resourceGroupName: 'thebus'
     location: 'West US 2'
     templateLocation: 'Linked artifact'
-    csmFile: './environment.json'
+    csmFile: ./environment.json
     deploymentMode: 'Complete'
 - task: Docker@2
   displayName: Build an image

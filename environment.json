@@ -2,14 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "location": {
-        "type": "string",
-        "metadata": {
-          "description": "The region where resources are deployed"
-        },
-        "defaultValue": "[resourceGroup().location]"
-      },
-
       "acrName": {
         "defaultValue": "thebusacr",
         "type": "string",
@@ -17,7 +9,6 @@
             "description": "Name of the Azure Container Registry"
         }
     },
-
     "acrTier": {
         "defaultValue": "Basic",
         "allowedValues": [
@@ -35,14 +26,14 @@
         "metadata": {
           "description": "Name of Event Grid Topic"
         },
-        "defaultValue": "[concat('eventgridtopic-', uniqueString(resourceGroup().id))]"
+        "defaultValue": "[concat('core-events-', uniqueString(resourceGroup().id))]"
       },
       "eventGridSubscriptionName": {
         "type": "string",
         "metadata": {
           "description": "Name of Event Grid Subscription"
         },
-        "defaultValue": "[concat('eventgridsubscription-', uniqueString(resourceGroup().id))]"
+        "defaultValue": "[concat('all-events-', uniqueString(resourceGroup().id))]"
       },
       "eventGridSubscriptionIncludedEventTypes": {
         "type": "string",
@@ -71,28 +62,28 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2",
-            "name": "[variables('storageAccountName')]",
-            "apiVersion": "2018-07-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "accessTier": "Hot",
-                "encryption": {
-                    "services": {
-                        "blob": {
-                            "enabled": true
-                        },
-                        "queue": {
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
+          "type": "Microsoft.Storage/storageAccounts",
+          "sku": {
+              "name": "Standard_LRS",
+              "tier": "Standard"
+          },
+          "kind": "StorageV2",
+          "name": "[variables('storageAccountName')]",
+          "apiVersion": "2018-07-01",
+          "location": "[variables('location')]",
+          "properties": {
+              "accessTier": "Hot",
+              "encryption": {
+                  "services": {
+                      "blob": {
+                          "enabled": true
+                      },
+                      "queue": {
+                          "enabled": true
+                      }
+                  },
+                  "keySource": "Microsoft.Storage"
+              }
             },
             "resources": [
                 {
@@ -158,24 +149,23 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
             ]
         },
-      {
-        "apiVersion": "2018-05-01-preview",
-        "type": "Microsoft.EventGrid/topics",
-        "name": "[variables('eventGridTopic').name]",
-        "location": "[variables('eventGridTopic').location]",
-        "properties": {
-          "inputSchema": "CloudEventV01Schema"
+        {
+          "apiVersion": "2018-05-01-preview",
+          "type": "Microsoft.EventGrid/topics",
+          "name": "[variables('eventGridTopic').name]",
+          "location": "[variables('eventGridTopic').location]",
+          "properties": {
+            "inputSchema": "CloudEventV01Schema"
+          }
+        },
+        {
+          "apiVersion": "2018-05-01-preview",
+          "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
+          "name": "[concat(variables('eventGridTopic').name, '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
+          "location": "[variables('eventGridSubscription').location]",
+          "dependsOn": [
+            "[variables('eventGridTopic').name]"
+          ]
         }
-      },
-      {
-        "apiVersion": "2018-05-01-preview",
-        "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
-        "name": "[concat(variables('eventGridTopic').name, '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
-        "location": "[variables('eventGridSubscription').location]",
-        "dependsOn": [
-          "[variables('eventGridTopic').name]"
-        ]
-      }
     ]
-  }
 }
