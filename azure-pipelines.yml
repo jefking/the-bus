@@ -8,3 +8,10 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker Hub'
+    repository: 'jefking/thebus'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
