@@ -54,6 +54,7 @@
     },
     "variables": {
       "storageAccountName": "thebus",
+      "containerGroupName": "compute-bus",
       "location": "[resourceGroup().location]",
       "eventGridTopic": {
         "name": "[parameters('eventGridTopicName')]",
