@@ -53,6 +53,7 @@
       }
     },
     "variables": {
+      "storageAccountName": "thebus",
       "eventGridTopic": {
         "name": "[parameters('eventGridTopicName')]",
         "resourceId": "[resourceId('Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]",
