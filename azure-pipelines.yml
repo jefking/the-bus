@@ -4,11 +4,10 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-jobs:
-- job: Docker@2
-  displayName: 'container build & push'
+steps:
+- task: Docker@2
+  displayName: Build an image
   inputs:
-    containerRegistry: 'Docker Hub'
     repository: 'jefking/thebus'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
+    command: build
+    Dockerfile: compute/Dockerfile
