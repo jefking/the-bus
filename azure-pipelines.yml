@@ -1,15 +1,12 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
 pool:
   vmImage: 'ubuntu-latest'
 
-- task: Docker@2
+jobs:
+- job: Docker@2
+  displayName: 'container build & push'
   inputs:
     containerRegistry: 'Docker Hub'
     repository: 'jefking/thebus'
