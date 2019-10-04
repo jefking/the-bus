@@ -5,6 +5,23 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: AzureResourceManagerTemplateDeployment@1
+  inputs:
+    deploymentScope: 'Resource Group'
+    ConnectedServiceName: 'Visual Studio Enterprise (011fd5e2-60c9-4a71-8bcd-659a9fbbfd4c)'
+    subscriptionName: '011fd5e2-60c9-4a71-8bcd-659a9fbbfd4c'
+    action: 'Validate Resource Group'
+    resourceGroupName: 'thebus'
+    location: 'West US 2'
+    templateLocation: 'Linked artifact'
+    csmFile: './environment.json'
+    deploymentMode: 'Validate'
+- task: Docker@2
+  displayName: Build an image
+  inputs:
+    repository: 'jefking/thebus'
+    command: build
+    Dockerfile: compute/Dockerfile
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
@@ -16,9 +33,3 @@ steps:
     templateLocation: 'Linked artifact'
     csmFile: './environment.json'
     deploymentMode: 'Complete'
-- task: Docker@2
-  displayName: Build an image
-  inputs:
-    repository: 'jefking/thebus'
-    command: build
-    Dockerfile: compute/Dockerfile
