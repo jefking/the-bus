@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: AzureResourceManagerTemplateDeployment@1
+- task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
     ConnectedServiceName: 'Visual Studio Enterprise (011fd5e2-60c9-4a71-8bcd-659a9fbbfd4c)'
