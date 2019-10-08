@@ -46,6 +46,8 @@
     "variables": {
       "storageAccountName": "thebus",
       "containerGroupName": "compute-bus",
+      "memoryInGb": 1.5,
+      "cpuCores": 1,
       "location": "[resourceGroup().location]",
       "eventGridTopic": {
         "name": "[parameters('eventGridTopicName')]",
