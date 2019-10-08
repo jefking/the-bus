@@ -44,6 +44,7 @@
       }
     },
     "variables": {
+      "image": "hello-world",
       "storageAccountName": "thebus",
       "containerGroupName": "compute-bus",
       "memoryInGb": 1.5,
@@ -152,22 +153,22 @@
             ]
         },
         {
-          "apiVersion": "2018-05-01-preview",
-          "type": "Microsoft.EventGrid/topics",
-          "name": "[variables('eventGridTopic').name]",
-          "location": "[variables('eventGridTopic').location]",
-          "properties": {
-            "inputSchema": "CloudEventV01Schema"
-          }
-        },
-        {
-          "apiVersion": "2018-05-01-preview",
-          "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
-          "name": "[concat(variables('eventGridTopic').name, '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
-          "location": "[variables('eventGridSubscription').location]",
-          "dependsOn": [
-            "[variables('eventGridTopic').name]"
-          ]
+            "type": "Microsoft.Storage/storageAccounts/providers/eventSubscriptions",
+            "name": "[concat(parameters('storageName'), '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
+            "apiVersion": "2018-01-01",
+            "dependsOn": [
+              "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "filter": {
+                    "subjectBeginsWith": "",
+                    "subjectEndsWith": "",
+                    "isSubjectCaseSensitive": false,
+                    "includedEventTypes": [
+                        "All"
+                    ]
+                }
+            }
         }
     ]
 }
