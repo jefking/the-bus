@@ -154,7 +154,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/providers/eventSubscriptions",
-            "name": "[concat(parameters('storageAccountName'), '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
+            "name": "[concat(variables('storageAccountName'), '/Microsoft.EventGrid/', variables('eventGridSubscription').name)]",
             "apiVersion": "2018-01-01",
             "dependsOn": [
               "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
