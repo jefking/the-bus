@@ -46,15 +46,15 @@
     "variables": {
       "storageAccountName": "thebus",
       "containerGroupName": "compute-bus",
-      "location": "[resourceGroup().location]",
+      "location": "[variables('location')]",
       "eventGridTopic": {
         "name": "[parameters('eventGridTopicName')]",
         "resourceId": "[resourceId('Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]",
-        "location": "[parameters('location')]"
+        "location": "[variables('location')]"
       },
       "eventGridSubscription": {
         "name": "[parameters('eventGridSubscriptionName')]",
-        "location": "[parameters('location')]",
+        "location": "[variables('location')]",
         "filter": {
           "includedEventTypes": "[split(parameters('eventGridSubscriptionIncludedEventTypes'), ',')]"
         }
